@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity, SafeAreaView, ScrollView, useWindowDimens
 import LibraryScreen from './src/screens/LibraryScreen';
 import MeditationScreen from './src/screens/MeditationScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
+import ReflectionScreen from './src/screens/ReflectionScreen';
 import styles from './src/styles';
 import { toDateKey } from './src/utils/dates';
 import songsData from './songs.json';
@@ -13,6 +14,7 @@ const SESSION_LOG_KEY = 'stotra.meditation.sessions.v1';
 const CHECKIN_LOG_KEY = 'stotra.daily.checkins.v1';
 const REMINDER_KEY = 'stotra.daily.reminder.v1';
 const REMINDER_NOTIFICATION_ID_KEY = 'stotra.daily.reminder.notificationId.v1';
+const REFLECTION_LOG_KEY = 'nityam.anger.reflections.v1';
 const REMINDER_CHANNEL_ID = 'daily-practice-reminders';
 
 if (Platform.OS !== 'web') {
@@ -46,6 +48,9 @@ export default function App() {
   const [chantCount, setChantCount] = useState(0);
   const [sessionEndedEarly, setSessionEndedEarly] = useState(false);
   const [sessionLogs, setSessionLogs] = useState([]);
+  const [reflections, setReflections] = useState([]);
+  const [reflectionsReady, setReflectionsReady] = useState(false);
+  const [reflectionError, setReflectionError] = useState('');
   const [sessionLogReady, setSessionLogReady] = useState(false);
   const [sessionLogError, setSessionLogError] = useState('');
   const [checkins, setCheckins] = useState({});
@@ -64,6 +69,7 @@ export default function App() {
   const [reminderBusy, setReminderBusy] = useState(false);
   const [reminderError, setReminderError] = useState('');
   const sessionLogsRef = useRef([]);
+  const reflectionsRef = useRef([]);
   const sessionStartedRef = useRef(false);
   const sessionLoggedRef = useRef(false);
 
@@ -181,6 +187,52 @@ export default function App() {
 
   useEffect(() => {
     let isMounted = true;
+    const loadReflections = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(REFLECTION_LOG_KEY);
+        const parsed = stored ? JSON.parse(stored) : [];
+        if (isMounted && Array.isArray(parsed)) {
+          reflectionsRef.current = parsed;
+          setReflections(parsed);
+        }
+      } catch {
+        if (isMounted) setReflectionError('Could not load your saved reflections.');
+      } finally {
+        if (isMounted) setReflectionsReady(true);
+      }
+    };
+    loadReflections();
+    return () => { isMounted = false; };
+  }, []);
+
+  const saveReflection = useCallback(async (reflection) => {
+    const updatedReflections = [reflection, ...reflectionsRef.current];
+    try {
+      await AsyncStorage.setItem(REFLECTION_LOG_KEY, JSON.stringify(updatedReflections));
+      reflectionsRef.current = updatedReflections;
+      setReflections(updatedReflections);
+      setReflectionError('');
+      return true;
+    } catch {
+      setReflectionError('This reflection could not be saved on this device. Please try again.');
+      return false;
+    }
+  }, []);
+
+  const deleteReflection = useCallback(async (id) => {
+    const updatedReflections = reflectionsRef.current.filter((reflection) => reflection.id !== id);
+    try {
+      await AsyncStorage.setItem(REFLECTION_LOG_KEY, JSON.stringify(updatedReflections));
+      reflectionsRef.current = updatedReflections;
+      setReflections(updatedReflections);
+      setReflectionError('');
+    } catch {
+      setReflectionError('This reflection could not be deleted. Please try again.');
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
 
     const loadSessionLogs = async () => {
       try {
@@ -261,7 +313,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.hero}>
           <View style={styles.heroTopRow}>
             <View style={styles.omBadge}>
@@ -284,14 +336,19 @@ export default function App() {
           <TouchableOpacity style={[styles.modeTab, activeSection === 'calendar' && styles.activeModeTab]} onPress={() => setActiveSection('calendar')} activeOpacity={0.8}>
             <Text style={[styles.modeTabText, activeSection === 'calendar' && styles.activeModeTabText]}>Calendar</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={[styles.modeTab, activeSection === 'reflect' && styles.activeModeTab]} onPress={() => setActiveSection('reflect')} activeOpacity={0.8}>
+            <Text style={[styles.modeTabText, activeSection === 'reflect' && styles.activeModeTabText]}>Reflect</Text>
+          </TouchableOpacity>
         </View>
 
         {activeSection === 'library' ? (
           <LibraryScreen {...{ isTabletLayout, categories, selectedCategory, setSelectedCategory, searchQuery, setSearchQuery, filteredSongs, selectedSong, setSelectedSong, setFontSize, fontSize }} />
         ) : activeSection === 'meditate' ? (
           <MeditationScreen {...{ isTabletLayout, sessionMinutes, setSessionMinutes, setSecondsRemaining, setChantCount, sessionEndedEarly, setSessionEndedEarly, sessionStartedRef, sessionLoggedRef, isMeditating, secondsRemaining, setIsMeditating, recordSession, chantCount, sessionLogs, sessionLogError, sessionLogReady }} />
-        ) : (
+        ) : activeSection === 'calendar' ? (
           <CalendarScreen {...{ isTabletLayout, isWeb: Platform.OS === 'web', calendarMonth, setCalendarMonth, checkins, selectedDate, setSelectedDate, todayKey, updateCheckin, checkinError, checkinReady, reminderMinutes, reminderEnabled, reminderReady, reminderBusy, reminderError, saveReminder }} />
+        ) : (
+          <ReflectionScreen {...{ isTabletLayout, reflections, reflectionsReady, reflectionError, saveReflection, deleteReflection }} />
         )}
       </ScrollView>
     </SafeAreaView>

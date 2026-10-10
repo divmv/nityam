@@ -7,9 +7,10 @@ Nityam is a quiet, installable web app for daily prayer and meditation. It is bu
 - A searchable library of sloka lyrics.
 - A meditation timer with a mantra, chant counter, and session log.
 - A calendar for checking off morning prayer and meditation, with monthly totals and streaks.
-- Local saving for check-ins and meditation sessions on the device/browser where you use the app.
+- A Pause & Reflect journal with a guided breathing pause, anger intensity notes, and response reflections.
+- Local saving for check-ins, meditation sessions, and reflections on the device/browser where you use the app.
 
-Prayer reminders are not available in the installable web app. Your data is not synced to an account or backed up to a server. Clearing the browser's site data or removing the app may erase locally saved progress, so keep your own backup if the records matter to you.
+Prayer reminders are not available in the installable web app. Your data is not synced to an account or backed up to a server. Clearing the browser's site data or removing the app may erase locally saved progress, including private reflection notes, so keep your own backup if the records matter to you.
 
 ## Run locally
 
