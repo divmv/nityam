@@ -71,6 +71,7 @@ The installed icon opens Nityam in its own app-style window. The Home Screen ver
 - `src/utils/` — date helpers.
 - `songs.json` — prayer and mantra lyrics shown in the library.
 - `public/` — web app manifest, browser entry page, and install icons.
+- `assets/nityam-icon.svg` — editable vector source for the app icon; `scripts/generate-icons.ps1` renders the web and native PNG sizes.
 
 ## More information
 
