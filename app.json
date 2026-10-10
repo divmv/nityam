@@ -1,15 +1,21 @@
 {
   "expo": {
-    "name": "lyrics-app",
+    "name": "Nityam",
     "slug": "lyrics-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.prayers.mobile",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.prayers.mobile",
+      "permissions": [
+        "android.permission.VIBRATE",
+        "android.permission.SCHEDULE_EXACT_ALARM"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -18,7 +24,17 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "854aeb6c-3dd6-4590-8d81-8ecd71ccaef4"
+      }
+    },
+    "owner": "nastypotaahto"
   }
 }
