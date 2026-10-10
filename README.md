@@ -4,8 +4,8 @@ Nityam is a quiet, installable web app for daily prayer and meditation. It is bu
 
 ## What it includes
 
-- A searchable library of stotrams, chalisa, and suprabhatam lyrics.
-- A meditation timer with the Gayatri mantra, chant counter, and session log.
+- A searchable library of sloka lyrics.
+- A meditation timer with a mantra, chant counter, and session log.
 - A calendar for checking off morning prayer and meditation, with monthly totals and streaks.
 - Local saving for check-ins and meditation sessions on the device/browser where you use the app.
 
